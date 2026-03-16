@@ -1,0 +1,44 @@
+{
+  "title": "高德通勤时间",
+  "config": {
+    "step": {
+      "user": {
+        "title": "配置高德通勤时间",
+        "description": "请填写高德地图 Web API Key 和起终点坐标。\n\n坐标格式：经度,纬度（例如：{coord_example}）\n\n📅 更新频率（自动）：早高峰 07:00–09:00 每 {peak_interval} 分钟，其他时段每 {normal_interval} 分钟。\n\n可前往 [高德开放平台](https://lbs.amap.com/) 申请免费 API Key。",
+        "data": {
+          "api_key": "高德 Web API Key",
+          "origin": "出发地坐标（经度,纬度）",
+          "destination": "目的地坐标（经度,纬度）",
+          "origin_name": "出发地名称",
+          "destination_name": "目的地名称"
+        }
+      }
+    },
+    "error": {
+      "invalid_api_key": "API Key 无效，请检查后重试",
+      "invalid_coord": "坐标格式错误，请输入：经度,纬度（例如：116.397428,39.90923）",
+      "cannot_connect": "无法连接到高德服务器，请检查网络",
+      "api_error": "高德 API 返回错误，请检查参数"
+    },
+    "abort": {
+      "already_configured": "该路线已配置"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "修改通勤路线",
+        "description": "📅 更新频率（自动）：早高峰 07:00–09:00 每 {peak_interval} 分钟，其他时段每 {normal_interval} 分钟。",
+        "data": {
+          "origin": "出发地坐标（经度,纬度）",
+          "destination": "目的地坐标（经度,纬度）",
+          "origin_name": "出发地名称",
+          "destination_name": "目的地名称"
+        }
+      }
+    },
+    "error": {
+      "invalid_coord": "坐标格式错误，请输入：经度,纬度"
+    }
+  }
+}

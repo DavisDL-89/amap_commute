@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Amap Commute Setup",
+        "description": "Enter your Amap Web API Key and coordinates.\n\nCoordinate format: longitude,latitude (e.g. {coord_example})\n\n📅 Auto update schedule: Peak hours 07:00–09:00 every {peak_interval} min, other times every {normal_interval} min.\n\nGet a free API Key at [Amap Open Platform](https://lbs.amap.com/).",
+        "data": {
+          "api_key": "Amap Web API Key",
+          "origin": "Origin Coordinates (lng,lat)",
+          "destination": "Destination Coordinates (lng,lat)",
+          "origin_name": "Origin Name",
+          "destination_name": "Destination Name"
+        }
+      }
+    },
+    "error": {
+      "invalid_api_key": "Invalid API Key, please check and retry",
+      "invalid_coord": "Invalid coordinate format. Use: longitude,latitude (e.g. 116.397428,39.90923)",
+      "cannot_connect": "Cannot connect to Amap server, check your network",
+      "api_error": "Amap API returned an error, check your parameters"
+    },
+    "abort": {
+      "already_configured": "This route is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Update Commute Route",
+        "description": "📅 Auto update schedule: Peak hours 07:00–09:00 every {peak_interval} min, other times every {normal_interval} min.",
+        "data": {
+          "origin": "Origin Coordinates (lng,lat)",
+          "destination": "Destination Coordinates (lng,lat)",
+          "origin_name": "Origin Name",
+          "destination_name": "Destination Name"
+        }
+      }
+    },
+    "error": {
+      "invalid_coord": "Invalid coordinate format. Use: longitude,latitude"
+    }
+  }
+}
