@@ -1,7 +1,7 @@
 {
   "domain": "amap_commute",
   "name": "高德通勤时间",
-  "version": "1.4.0",
+  "version": "1.4.3",
   "documentation": "https://github.com/your-repo/amap_commute",
   "issue_tracker": "https://github.com/your-repo/amap_commute/issues",
   "dependencies": [],

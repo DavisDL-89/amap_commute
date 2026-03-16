@@ -64,6 +64,10 @@ home-assistant_v2.db
 # Documentation drafts
 *_DRAFT.md
 *_TEMP.md
+*_GUIDE.md
+*_NOTES.md
+*_OPTIMIZATION.md
+*.bat
 
 # API Keys (if any)
 .env
@@ -72,7 +76,6 @@ home-assistant_v2.db
 *.pem
 
 #AI files
-*.md
 *.ps1
 *.html
 *.zip

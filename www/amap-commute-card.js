@@ -1,5 +1,5 @@
 /**
- * 高德通勤时间卡片 - Lovelace Custom Card  v1.4.0
+ * 高德通勤时间卡片 - Lovelace Custom Card  v1.4.3
  *
  * 交互功能：
  * - 点击通勤时间   → 今日历史通勤折线图
@@ -10,6 +10,25 @@
  * entity: sensor.xxx
  * amap_web_key: 你的高德JS-API-Key
  * title: 今日通勤
+ *
+ * v1.4.3 更新：
+ * - ✅ 修复 iOS App WebView 地图不显示问题
+ * - ✅ 添加 iOS WebView 专用容器修复
+ * - ✅ 强制设置容器尺寸（px 单位）
+ * - ✅ 多次刷新地图尺寸确保正确显示
+ * - ✅ 添加 iOS 特定检测和优化
+ *
+ * v1.4.2 更新：
+ * - ✅ 修复手机端地图不显示问题
+ * - ✅ 移除导致地图底图缺失的 features 配置
+ * - ✅ 添加详细的调试日志
+ * - ✅ 优化地图初始化时序
+ *
+ * v1.4.1 更新：
+ * - ✅ 优化手机端地图显示
+ * - ✅ 添加响应式布局
+ * - ✅ 优化触摸事件处理
+ * - ✅ 精简移动端地图要素
  */
 
 const AMAP_JS_VERSION = "2.0";
@@ -288,8 +307,10 @@ class AmapCommuteCard extends HTMLElement {
     // 根据当前 entity 的 route_index 选择路线数据
     const currentRoute = this._getCurrentRouteData();
     this._updateInfo(entity, currentRoute);
+
+    // 延迟初始化地图，确保容器尺寸正确
     if (!this._mapInited && (currentRoute.polyline || []).length > 0) {
-      this._initMap(currentRoute);
+      setTimeout(() => this._initMap(currentRoute), 100);
     } else if (this._mapInited) {
       this._updateMapRoute(currentRoute);
     }
@@ -303,6 +324,27 @@ class AmapCommuteCard extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host { display:block; font-family:var(--primary-font-family,sans-serif); }
+
+        /* 移动端响应式优化 */
+        @media (max-width: 768px) {
+          .map-container { height:200px; }
+          .detail-map-wrap { height:180px; }
+          .duration-badge { font-size:17px; padding:4px 12px; }
+          .meta-item { font-size:11px; padding:2px 7px; }
+          .location-name { font-size:12px; max-width:70px; }
+          .stat-box { padding:7px 4px; min-width:50px; }
+          .stat-val { font-size:15px; }
+          .zoom-btn { width:32px;height:32px; }
+        }
+
+        @media (max-width: 480px) {
+          .map-container { height:180px; }
+          .detail-map-wrap { height:160px; }
+          .duration-badge { font-size:16px; padding:3px 10px; }
+          .route-info { padding:6px 12px 12px; }
+          .card-header { padding:12px 14px 6px; font-size:13px; }
+        }
+
         .card {
           background:var(--ha-card-background,var(--card-background-color,#fff));
           border-radius:var(--ha-card-border-radius,12px);
@@ -310,12 +352,22 @@ class AmapCommuteCard extends HTMLElement {
           overflow:hidden;
         }
         .card-header {
-          padding:14px 16px 8px; font-size:14px; font-weight:600;
-          color:var(--secondary-text-color); letter-spacing:.04em;
-          display:flex; align-items:center; gap:6px;
+          padding:14px 16px 8px;
+          font-size:14px;
+          font-weight:600;
+          color:var(--secondary-text-color);
+          letter-spacing:.04em;
+          display:flex;
+          align-items:center;
+          gap:6px;
         }
         .card-header ha-icon { --mdc-icon-size:18px; color:var(--primary-color); }
-        .route-info { padding:8px 16px 14px; display:flex; align-items:center; }
+        .route-info {
+          padding:8px 16px 14px;
+          display:flex;
+          align-items:center;
+          min-height:60px;
+        }
         .location {
           display:flex; flex-direction:column; align-items:center;
           flex:0 0 auto; min-width:68px; max-width:96px;
@@ -333,6 +385,7 @@ class AmapCommuteCard extends HTMLElement {
         }
         .clickable {
           cursor:pointer;user-select:none;
+          -webkit-tap-highlight-color:transparent;
           transition:transform .12s,opacity .12s,filter .12s;
         }
         .clickable:hover  { filter:brightness(1.1); }
@@ -362,12 +415,34 @@ class AmapCommuteCard extends HTMLElement {
           border-radius:4px;padding:2px 8px;
           font-size:12px;font-weight:600;color:#fff;
         }
-        /* 主地图 */
-        .map-container { position:relative;width:100%;height:240px;background:#f0f0f0; }
-        #${mapId} { width:100%;height:100%; }
+        /* 主地图 - 优化手机端显示 */
+        .map-container {
+          position:relative;
+          width:100%;
+          height:240px;
+          background:#e8edf2;
+          overflow:hidden;
+          touch-action:none;
+        }
+        #${mapId} {
+          width:100%;
+          height:100%;
+          display:block;
+          position:absolute;
+          top:0;
+          left:0;
+          z-index:1;
+        }
         .map-loading {
-          position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-          font-size:13px;color:var(--secondary-text-color);background:#f5f5f5;
+          position:absolute;
+          inset:0;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:13px;
+          color:var(--secondary-text-color);
+          background:#f5f5f5;
+          z-index:10;
         }
         /* 缩放按钮（主地图右上角） */
         .zoom-btns {
@@ -425,15 +500,35 @@ class AmapCommuteCard extends HTMLElement {
         .tleg-item { display:flex;align-items:center;gap:3px;font-size:11px;color:#666; }
         .tleg-dot  { width:10px;height:10px;border-radius:2px; }
 
-        /* ── 详情地图 ── */
+        /* ── 详情地图 - 优化手机端显示 ── */
         .detail-map-wrap {
-          position:relative;width:100%;height:220px;border-radius:10px;overflow:hidden;
-          background:#e8edf2;margin-bottom:4px;
+          position:relative;
+          width:100%;
+          height:220px;
+          border-radius:10px;
+          overflow:hidden;
+          background:#e8edf2;
+          margin-bottom:4px;
+          touch-action:none;
+          -webkit-overflow-scrolling:touch;
         }
-        .detail-map-inner { width:100%;height:100%; }
+        .detail-map-inner {
+          width:100%;
+          height:100%;
+          display:block;
+          position:absolute;
+          top:0;
+          left:0;
+          z-index:1;
+        }
         .detail-zoom-btns {
-          position:absolute;right:8px;top:8px;
-          display:flex;flex-direction:column;gap:4px;z-index:10;
+          position:absolute;
+          right:8px;
+          top:8px;
+          display:flex;
+          flex-direction:column;
+          gap:4px;
+          z-index:10;
         }
 
         /* ── 分路段 ── */
@@ -752,15 +847,33 @@ class AmapCommuteCard extends HTMLElement {
 
   async _initDetailMap(container, attrs) {
     if (!container || !this._config.amap_web_key) return null;
-    container.style.cssText = "width:100%;height:100%;";
+
+    // iOS WebView 特定修复
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    container.style.cssText = "width:100%;height:100%;display:block;" + (isIOS ? "position:absolute;top:0;left:0;" : "");
+
     try {
       const AMap = await loadAmapScript(this._config.amap_web_key);
       const poly = attrs.polyline || [];
       const center = poly.length > 0 ? poly[Math.floor(poly.length/2)] : [116.397,39.909];
+
+      // 检测是否为移动设备
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log("[AmapCommuteCard] 详情地图 - 移动设备：", isMobile, "iOS：", isIOS);
+
       const map = new AMap.Map(container, {
         zoom: 12, center,
         mapStyle: "amap://styles/normal",
         resizeEnable: true,
+        // 手机端不设置 features，使用默认配置以显示完整地图
+        viewMode: "2D",
+        zoomEnable: true,
+        dragEnable: true,
+        doubleClickZoom: true,
+        scrollWheel: !isMobile,
+        touchZoom: isMobile,
+        rotateEnable: false,
+        pitchEnable: false,
       });
       return new Promise(resolve => {
         map.on("complete", () => {
@@ -769,6 +882,27 @@ class AmapCommuteCard extends HTMLElement {
         });
         // 超时保底
         setTimeout(() => resolve(map), 5000);
+
+        // iOS WebView 额外优化
+        if (isIOS) {
+          setTimeout(() => {
+            map.getSize();
+            map.setFitView();
+          }, 100);
+          setTimeout(() => {
+            map.getSize();
+            map.setFitView();
+          }, 500);
+          setTimeout(() => {
+            map.getSize();
+            map.setFitView();
+          }, 1000);
+        } else if (isMobile) {
+          setTimeout(() => {
+            map.getSize();
+            map.setFitView();
+          }, 300);
+        }
       });
     } catch (e) {
       container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;font-size:13px;">地图加载失败：${e.message}</div>`;
@@ -783,16 +917,55 @@ class AmapCommuteCard extends HTMLElement {
     const mapId = `amap-${this._config.entity.replace(/\./g, "_")}`;
     const container = this.shadowRoot.getElementById(mapId);
     const loading   = this.shadowRoot.getElementById("map-loading");
+
+    console.log("[AmapCommuteCard] 初始化地图，容器：", container);
+    console.log("[AmapCommuteCard] 容器尺寸：", container?.clientWidth, "x", container?.clientHeight);
+
+    if (!container) {
+      console.error("[AmapCommuteCard] 地图容器不存在！");
+      if (loading) loading.textContent = "地图容器初始化失败";
+      return;
+    }
+
+    // iOS WebView 特定修复：强制容器尺寸
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+      container.style.width = container.clientWidth + "px";
+      container.style.height = container.clientHeight + "px";
+      console.log("[AmapCommuteCard] iOS 设备，强制设置容器尺寸");
+    }
+
     try {
       const AMap = await loadAmapScript(this._config.amap_web_key);
+      console.log("[AmapCommuteCard] 高德地图脚本加载成功");
+
       const poly = attrs.polyline || [];
       const center = poly.length > 0 ? poly[Math.floor(poly.length/2)] : [116.397,39.909];
+
+      // 检测是否为移动设备
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log("[AmapCommuteCard] 移动设备检测：", isMobile, "iOS检测：", isIOS);
+
       this._map = new AMap.Map(container, {
         zoom: 12, center,
         mapStyle: "amap://styles/normal",
         resizeEnable: true,
+        // 手机端不设置 features，使用默认配置以显示完整地图
+        viewMode: "2D",
+        // 禁用默认缩放控件（手机端用手势）
+        zoomEnable: true,
+        dragEnable: true,
+        doubleClickZoom: true,
+        scrollWheel: !isMobile, // 手机端禁用滚轮缩放
+        touchZoom: isMobile,   // 手机端启用触摸缩放
+        rotateEnable: false,    // 手机端禁用旋转
+        pitchEnable: false,    // 手机端禁用倾斜
       });
+
+      console.log("[AmapCommuteCard] 地图对象创建成功");
+
       this._map.on("complete", () => {
+        console.log("[AmapCommuteCard] 地图加载完成");
         if (loading) loading.style.display = "none";
         // 显示缩放按钮
         const zBtns = this.shadowRoot.getElementById("main-zoom-btns");
@@ -804,10 +977,44 @@ class AmapCommuteCard extends HTMLElement {
         this._polylines = polylines;
         this._markers   = markers;
         this._lastRouteHash = this._routeHash(attrs);
+
+        console.log("[AmapCommuteCard] 地图层添加完成，折线数：", polylines.length, "标记数：", markers.length);
+
+        // iOS WebView 额外优化：多次刷新确保地图正确显示
+        if (isIOS) {
+          setTimeout(() => {
+            console.log("[AmapCommuteCard] iOS 第一次尺寸刷新");
+            this._map.getSize();
+            this._map.setFitView();
+          }, 100);
+          setTimeout(() => {
+            console.log("[AmapCommuteCard] iOS 第二次尺寸刷新");
+            this._map.getSize();
+            this._map.setFitView();
+          }, 500);
+          setTimeout(() => {
+            console.log("[AmapCommuteCard] iOS 第三次尺寸刷新");
+            this._map.getSize();
+            this._map.setFitView();
+          }, 1000);
+        } else if (isMobile) {
+          setTimeout(() => {
+            const size = this._map.getSize();
+            console.log("[AmapCommuteCard] 手机端尺寸刷新：", size);
+            this._map.setFitView();
+          }, 300);
+        }
       });
+
+      // 添加错误监听
+      this._map.on("error", (err) => {
+        console.error("[AmapCommuteCard] 地图错误：", err);
+        if (loading) loading.textContent = "地图加载错误";
+      });
+
     } catch (e) {
-      console.error("[AmapCommuteCard]", e);
-      if (loading) loading.textContent = "地图加载失败，请检查 amap_web_key";
+      console.error("[AmapCommuteCard] 地图初始化异常：", e);
+      if (loading) loading.textContent = "地图加载失败：" + e.message;
     }
   }
 
@@ -875,7 +1082,7 @@ window.customCards.push({
 });
 
 console.info(
-  "%c 高德通勤时间卡片 %c v1.4.0 ",
+  "%c 高德通勤时间卡片 %c v1.4.3 ",
   "color:#fff;background:#4CAF50;padding:2px 6px;border-radius:4px 0 0 4px;font-weight:600",
   "color:#4CAF50;background:#f0f0f0;padding:2px 6px;border-radius:0 4px 4px 0"
 );
