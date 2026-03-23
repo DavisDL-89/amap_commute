@@ -1,0 +1,77 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Amap Commute Setup",
+        "description": "Enter your Amap Web API Key and coordinates.\n\nCoordinate format: longitude,latitude (e.g. {coord_example})\n\n📅 Auto update schedule: Peak hours 07:00–09:00 every {peak_interval} min, other times every {normal_interval} min.\n\nGet a free API Key at [Amap Open Platform](https://lbs.amap.com/).",
+        "data": {
+          "api_key": "Amap Web API Key",
+          "origin_mode": "Origin mode (manual/phone GPS)"
+        }
+      },
+      "manual_origin": {
+        "title": "Enter Manual Origin",
+        "data": {
+          "origin": "Origin Coordinates (lng,lat)",
+          "origin_name": "Origin Name",
+          "destination": "Destination Coordinates (lng,lat)",
+          "destination_name": "Destination Name"
+        }
+      },
+      "mobile_origin": {
+        "title": "Select Phone Tracker Entity",
+        "data": {
+          "mobile_tracker_entity": "Phone tracker entity (device_tracker.xxx)",
+          "origin_name": "Origin Name",
+          "destination": "Destination Coordinates (lng,lat)",
+          "destination_name": "Destination Name"
+        }
+      }
+    },
+    "error": {
+      "invalid_api_key": "Invalid API Key, please check and retry",
+      "invalid_coord": "Invalid coordinate format. Use: longitude,latitude (e.g. 116.397428,39.90923)",
+      "cannot_connect": "Cannot connect to Amap server, check your network",
+      "api_error": "Amap API returned an error, check your parameters",
+      "invalid_mobile_entity": "When phone GPS is enabled, tracker entity is required",
+      "invalid_mobile_entity_state": "Cannot get latitude/longitude from the tracker entity"
+    },
+    "abort": {
+      "already_configured": "This route is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Update Commute Route",
+        "description": "📅 Auto update schedule: Peak hours 07:00–09:00 every {peak_interval} min, other times every {normal_interval} min.",
+        "data": {
+          "origin_mode": "Origin mode (manual/phone GPS)"
+        }
+      },
+      "options_manual_origin": {
+        "title": "Enter Manual Origin",
+        "data": {
+          "origin": "Origin Coordinates (lng,lat)",
+          "origin_name": "Origin Name",
+          "destination": "Destination Coordinates (lng,lat)",
+          "destination_name": "Destination Name"
+        }
+      },
+      "options_mobile_origin": {
+        "title": "Select Phone Tracker Entity",
+        "data": {
+          "mobile_tracker_entity": "Phone tracker entity (device_tracker.xxx)",
+          "origin_name": "Origin Name",
+          "destination": "Destination Coordinates (lng,lat)",
+          "destination_name": "Destination Name"
+        }
+      }
+    },
+    "error": {
+      "invalid_coord": "Invalid coordinate format. Use: longitude,latitude",
+      "invalid_mobile_entity": "When phone GPS is enabled, tracker entity is required",
+      "invalid_mobile_entity_state": "Cannot get latitude/longitude from the tracker entity"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "domain": "amap_commute",
+  "name": "高德通勤时间",
+  "version": "1.5.0",
+  "documentation": "https://github.com/your-repo/amap_commute",
+  "issue_tracker": "https://github.com/your-repo/amap_commute/issues",
+  "dependencies": [],
+  "codeowners": [],
+  "requirements": ["aiohttp>=3.8.0"],
+  "config_flow": true,
+  "iot_class": "cloud_polling",
+  "homeassistant": "2021.12.0",
+  "icon": "mdi:map-marker-path"
+}
