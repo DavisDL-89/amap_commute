@@ -1,0 +1,66 @@
+{
+  "title": "高德通勤时间",
+  "config": {
+    "step": {
+      "user": {
+        "title": "出发地类型",
+        "description": "请先选择出发地如何确定。\n\n- **固定经纬度**：在下一步手动填写起点的经度、纬度。\n- **设备 / 人员定位**：在下一步选择 `device_tracker` 或 `person` 实体，集成将按定时任务读取其经纬度作为起点。\n\n目的地始终在下一步填写为固定坐标。\n\n📅 更新频率（自动）：早高峰 07:00–09:00 每 {peak_interval} 分钟，其他时段每 {normal_interval} 分钟。",
+        "data": {
+          "origin_mode": "出发地类型"
+        }
+      },
+      "route": {
+        "title": "路线与 API",
+        "description": "填写高德 **Web 服务** API Key、**目的地**坐标（经度,纬度），并根据上一步选择填写**固定出发点**或**追踪实体**。\n\n坐标示例：{coord_example}\n\n可前往 [高德开放平台](https://lbs.amap.com/) 申请 Key；前端地图需单独配置 JS Key（见卡片说明）。",
+        "data": {
+          "api_key": "高德 Web 服务 API Key",
+          "origin": "出发地坐标（经度,纬度）",
+          "origin_entity_id": "出发地实体",
+          "destination": "目的地坐标（经度,纬度）",
+          "origin_name": "出发地名称（展示用）",
+          "destination_name": "目的地名称（展示用）"
+        }
+      }
+    },
+    "error": {
+      "invalid_api_key": "API Key 无效，请检查后重试",
+      "invalid_coord": "坐标格式错误，请输入：经度,纬度（例如：116.397428,39.90923）",
+      "cannot_connect": "无法连接到高德服务器，请检查网络",
+      "api_error": "高德 API 返回错误，请检查参数",
+      "invalid_entity": "请选择 device_tracker 或 person 实体",
+      "unknown_entity": "找不到该实体，请检查是否已创建"
+    },
+    "abort": {
+      "already_configured": "该路线已配置"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "修改通勤路线",
+        "description": "可切换出发地类型并修改坐标或实体。API Key 不在此页修改（需删除集成后重新添加）。\n\n📅 更新频率（自动）：早高峰 07:00–09:00 每 {peak_interval} 分钟，其他时段每 {normal_interval} 分钟。",
+        "data": {
+          "origin_mode": "出发地类型",
+          "origin": "出发地坐标（经度,纬度）",
+          "origin_entity_id": "出发地实体",
+          "destination": "目的地坐标（经度,纬度）",
+          "origin_name": "出发地名称",
+          "destination_name": "目的地名称"
+        }
+      }
+    },
+    "error": {
+      "invalid_coord": "坐标格式错误，请输入：经度,纬度",
+      "invalid_entity": "请选择 device_tracker 或 person 实体",
+      "unknown_entity": "找不到该实体"
+    }
+  },
+  "selector": {
+    "origin_mode": {
+      "options": {
+        "static": "固定出发点（经纬度）",
+        "device_tracker": "设备 / 人员定位（device_tracker、person）"
+      }
+    }
+  }
+}

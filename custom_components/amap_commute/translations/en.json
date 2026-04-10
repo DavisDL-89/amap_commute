@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Origin type",
+        "description": "Choose how the **origin** is determined.\n\n- **Fixed coordinates**: enter longitude/latitude in the next step.\n- **Device / person tracking**: pick a `device_tracker` or `person` entity in the next step; the integration will read its GPS on each scheduled update.\n\n**Destination** is always a fixed coordinate (next step).\n\n📅 Auto update: peak 07:00–09:00 every {peak_interval} min, otherwise every {normal_interval} min.",
+        "data": {
+          "origin_mode": "Origin type"
+        }
+      },
+      "route": {
+        "title": "Route & API",
+        "description": "Enter your Amap **Web service** API Key, **destination** (lng,lat), then either fixed **origin** coordinates or a **tracking entity**, depending on the previous step.\n\nExample: {coord_example}\n\nGet a key at [Amap Open Platform](https://lbs.amap.com/). The Lovelace card uses a separate JS API key.",
+        "data": {
+          "api_key": "Amap Web service API Key",
+          "origin": "Origin coordinates (lng,lat)",
+          "origin_entity_id": "Origin entity",
+          "destination": "Destination coordinates (lng,lat)",
+          "origin_name": "Origin label (display)",
+          "destination_name": "Destination label (display)"
+        }
+      }
+    },
+    "error": {
+      "invalid_api_key": "Invalid API Key, please check and retry",
+      "invalid_coord": "Invalid coordinate format. Use: longitude,latitude (e.g. 116.397428,39.90923)",
+      "cannot_connect": "Cannot connect to Amap server, check your network",
+      "api_error": "Amap API returned an error, check your parameters",
+      "invalid_entity": "Select a device_tracker or person entity",
+      "unknown_entity": "Entity not found"
+    },
+    "abort": {
+      "already_configured": "This route is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Update commute route",
+        "description": "Change origin type, coordinates, or entity. The API Key cannot be changed here (remove and re-add the integration to change it).\n\n📅 Auto update: peak 07:00–09:00 every {peak_interval} min, otherwise every {normal_interval} min.",
+        "data": {
+          "origin_mode": "Origin type",
+          "origin": "Origin coordinates (lng,lat)",
+          "origin_entity_id": "Origin entity",
+          "destination": "Destination coordinates (lng,lat)",
+          "origin_name": "Origin name",
+          "destination_name": "Destination name"
+        }
+      }
+    },
+    "error": {
+      "invalid_coord": "Invalid coordinate format. Use: longitude,latitude",
+      "invalid_entity": "Select a device_tracker or person entity",
+      "unknown_entity": "Entity not found"
+    }
+  },
+  "selector": {
+    "origin_mode": {
+      "options": {
+        "static": "Fixed origin (coordinates)",
+        "device_tracker": "Device / person tracking (device_tracker, person)"
+      }
+    }
+  }
+}
