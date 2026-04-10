@@ -141,10 +141,9 @@ title: 今日通勤
 
 ## 仓库与协作
 
-请将下方占位符换成你的 GitHub 用户或组织名：
-
 - Issues：<https://github.com/DavisDL-89/amap_commute/issues>  
 - 仓库：<https://github.com/DavisDL-89/amap_commute>  
+- **用 GitHub CLI 发版**：见 [`docs/RELEASE_WITH_GH.md`](docs/RELEASE_WITH_GH.md)（`gh auth login` 后可在项目根目录执行 `.\scripts\release-gh.ps1`）  
 
 ---
 
