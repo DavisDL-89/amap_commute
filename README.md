@@ -143,8 +143,8 @@ title: 今日通勤
 
 请将下方占位符换成你的 GitHub 用户或组织名：
 
-- Issues：`https://github.com/<YOUR_GITHUB_USER>/amap_commute/issues`  
-- Discussions（若开启）：`https://github.com/<YOUR_GITHUB_USER>/amap_commute/discussions`  
+- Issues：<https://github.com/DavisDL-89/amap_commute/issues>  
+- 仓库：<https://github.com/DavisDL-89/amap_commute>  
 
 ---
 
