@@ -1,5 +1,5 @@
 /**
- * 高德通勤时间卡片 - Lovelace Custom Card  v1.7.6
+ * 高德通勤时间卡片 - Lovelace Custom Card  v1.7.7
  *
  * 交互功能：
  * - 点击通勤时间   → 今日历史通勤折线图
@@ -11,9 +11,9 @@
  * amap_web_key: 你的高德JS-API-Key
  * title: 今日通勤
  *
+ * v1.7.7 更新：
+ * - ✅ iOS HA App 主卡片地图灰底：在地图创建前强制设置像素尺寸 + 双重 layout 等待 + 强制重排，解决 Shadow DOM 百分比尺寸在 WebView 中计算错误的问题
  * v1.7.6 更新：
- * - ✅ iOS HA App 主卡片地图灰底：布局等待 + 父容器像素宽高 + getSize/resize + 路线 setFitView 回调 + ResizeObserver
- * v1.7.5 更新：
  * - ✅ 路线弹窗首次打开：弹层动画后 waitLayoutStable + ResizeObserver + 延迟 getSize/setFitView(路线)，修复地图右侧/底部灰边
  * v1.7.4 更新：
  * - ✅ 历史/路线弹窗：样式注入 document（acp-*），与卡片 ha-card 风格一致（Shadow 内样式原先无法作用到 body）
@@ -1279,17 +1279,31 @@ class AmapCommuteCard extends HTMLElement {
     const isIOSApp = isIOSLike && isHomeAssistantCompanionApp();
     const mapWrap = container.parentElement;
 
-    if (isIOSLike) {
+    // iOS HA App 关键修复：在创建地图前强制设置像素尺寸
+    // Shadow DOM 内的百分比尺寸在 WebView 中可能未正确计算
+    if (isIOSApp) {
+      // 先隐藏容器，强制重排后再显示
+      container.style.display = "none";
+      void container.offsetHeight; // 强制重排
+      container.style.display = "block";
+      this._applyMainMapContainerSize(container);
+      console.log("[AmapCommuteCard] iOS App - 强制设置容器像素尺寸（创建前）");
+      container.style.transform = "translateZ(0)";
+      container.style.webkitTransform = "translateZ(0)";
+    } else if (isIOSLike) {
       this._applyMainMapContainerSize(container);
       console.log("[AmapCommuteCard] iOS 设备，强制设置容器尺寸（首帧）");
-      if (isIOSApp) {
-        container.style.transform = "translateZ(0)";
-        container.style.webkitTransform = "translateZ(0)";
-      }
     }
 
     try {
-      if (isIOSLike) {
+      // iOS App 需要更长的延迟等待布局完全稳定
+      if (isIOSApp) {
+        await waitLayoutStable();
+        await waitLayoutStable(); // 双重等待
+        this._applyMainMapContainerSize(container);
+        await new Promise(function (r) { setTimeout(r, 350); });
+        this._applyMainMapContainerSize(container);
+      } else if (isIOSLike) {
         await waitLayoutStable();
         this._applyMainMapContainerSize(container);
       }
@@ -1303,8 +1317,8 @@ class AmapCommuteCard extends HTMLElement {
       const isMobile = isMobileUserAgent();
       console.log("[AmapCommuteCard] 移动设备检测：", isMobile, "iOS检测：", isIOSLike);
 
+      // iOS App 创建地图前再次确认容器尺寸
       if (isIOSApp) {
-        await new Promise(function (r) { setTimeout(r, 180); });
         this._applyMainMapContainerSize(container);
       }
 
@@ -1478,7 +1492,7 @@ if (!window.customCards.some((c) => c.type === "amap-commute-card")) {
 }
 
 console.info(
-  "%c 高德通勤时间卡片 %c v1.7.6 ",
+  "%c 高德通勤时间卡片 %c v1.7.7 ",
   "color:#fff;background:#4CAF50;padding:2px 6px;border-radius:4px 0 0 4px;font-weight:600",
   "color:#4CAF50;background:#f0f0f0;padding:2px 6px;border-radius:0 4px 4px 0"
 );
